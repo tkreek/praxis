@@ -1,68 +1,30 @@
 <script>
-  import { store_items } from "./data/store.js";
+  //Library
 
-  import Bulma from "./components/Bulma.svelte";
+  //Data
+  import { _items, _completedItems, _incompletedItems } from "./data/store.js";
 
-  let items;
-
-  const unsubscribe = store_items.subscribe(value => {
-    items = value;
-  });
-
-  console.log("here are some items", items);
-
-  function toggleComplete() {
-    console.log(this.id);
-    let id = this.id;
-
-    store_items.update(items => {
-      items.forEach(item => {
-        if (item.id === id) {
-          item.isComplete = !item.isComplete;
-        }
-      });
-      items.sort((a, b) => (a.isComplete > b.isComplete ? 1 : -1));
-      return items;
-    });
-  }
-
-  function removeItem() {
-    let id = this.parentElement.id;
-    store_items.update(items => {
-      items = items.filter(item => item.id !== id);
-      return items;
-    });
-  }
-
-  function sayHello() {
-    alert("say hello");
-  }
+  //Comonents
+  import ItemList from "./components/ItemList.svelte";
+  import Title from "./components/Title.svelte";
 </script>
 
 <style>
-  .isComplete {
-    text-decoration: line-through;
-    color: grey;
-  }
 
-  button {
-    border: none;
-    background-color: white;
-  }
 </style>
-
-<Bulma />
 
 <section class="section">
   <div class="container">
-    <ul>
-      {#each items as item, index}
-        <li class={item.isComplete ? 'isComplete' : ''} id={item.id}>
-          <span on:click={toggleComplete}>{item.text}</span>
-          <button>🖊</button>
-          <button on:click={removeItem}>🗑</button>
-        </li>
-      {/each}
-    </ul>
+    <Title />
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <h4 class="title is-4">ToDo</h4>
+    <ItemList items={$_completedItems} />
+    <h4 class="title is-4">Complete</h4>
+    <ItemList items={$_incompletedItems} />
+
   </div>
 </section>
