@@ -26,6 +26,23 @@
       return items;
     });
   }
+
+  function toggleComplete() {
+    let id = this.parentElement.id;
+    _items.update(items => {
+      items.forEach(item => {
+        if (item.id === id) {
+          item.isComplete = !item.isComplete;
+        }
+      });
+      console.log(items);
+      return items;
+    });
+  }
+
+  function onHover() {
+    console.log(this);
+  }
 </script>
 
 <style>
@@ -55,7 +72,11 @@
   on:finalize={handleDndFinalize}>
   {#each items as item (item.id)}
     <div animate:flip={{ duration: flipDurationMs }} id={item.id}>
-      <span class:completed={item.isComplete !== true}>{item.text}</span>
+      <span
+        class:completed={item.isComplete !== true}
+        on:click={toggleComplete}>
+        {item.text}
+      </span>
       <span>
         <button>🖋</button>
       </span>

@@ -1712,15 +1712,15 @@ var app = (function () {
 
     function get_each_context(ctx, list, i) {
     	const child_ctx = ctx.slice();
-    	child_ctx[4] = list[i];
+    	child_ctx[5] = list[i];
     	return child_ctx;
     }
 
-    // (56:2) {#each items as item (item.id)}
+    // (73:2) {#each items as item (item.id)}
     function create_each_block(key_1, ctx) {
     	let div;
     	let span0;
-    	let t0_value = /*item*/ ctx[4].text + "";
+    	let t0_value = /*item*/ ctx[5].text + "";
     	let t0;
     	let t1;
     	let span1;
@@ -1752,17 +1752,17 @@ var app = (function () {
     			button1.textContent = "🗑";
     			t5 = space();
     			attr_dev(span0, "class", "svelte-cpw4om");
-    			toggle_class(span0, "completed", /*item*/ ctx[4].isComplete !== true);
-    			add_location(span0, file, 57, 6, 1385);
+    			toggle_class(span0, "completed", /*item*/ ctx[5].isComplete !== true);
+    			add_location(span0, file, 74, 6, 1716);
     			attr_dev(button0, "class", "svelte-cpw4om");
-    			add_location(button0, file, 59, 8, 1474);
-    			add_location(span1, file, 58, 6, 1459);
+    			add_location(button0, file, 80, 8, 1863);
+    			add_location(span1, file, 79, 6, 1848);
     			attr_dev(button1, "class", "svelte-cpw4om");
-    			add_location(button1, file, 62, 8, 1529);
-    			add_location(span2, file, 61, 6, 1514);
-    			attr_dev(div, "id", div_id_value = /*item*/ ctx[4].id);
+    			add_location(button1, file, 83, 8, 1918);
+    			add_location(span2, file, 82, 6, 1903);
+    			attr_dev(div, "id", div_id_value = /*item*/ ctx[5].id);
     			attr_dev(div, "class", "svelte-cpw4om");
-    			add_location(div, file, 56, 4, 1316);
+    			add_location(div, file, 73, 4, 1647);
     			this.first = div;
     		},
     		m: function mount(target, anchor) {
@@ -1778,18 +1778,22 @@ var app = (function () {
     			append_dev(div, t5);
 
     			if (!mounted) {
-    				dispose = listen_dev(button1, "click", /*removeItem*/ ctx[3], false, false, false);
+    				dispose = [
+    					listen_dev(span0, "click", /*toggleComplete*/ ctx[4], false, false, false),
+    					listen_dev(button1, "click", /*removeItem*/ ctx[3], false, false, false)
+    				];
+
     				mounted = true;
     			}
     		},
     		p: function update(ctx, dirty) {
-    			if (dirty & /*items*/ 1 && t0_value !== (t0_value = /*item*/ ctx[4].text + "")) set_data_dev(t0, t0_value);
+    			if (dirty & /*items*/ 1 && t0_value !== (t0_value = /*item*/ ctx[5].text + "")) set_data_dev(t0, t0_value);
 
     			if (dirty & /*items*/ 1) {
-    				toggle_class(span0, "completed", /*item*/ ctx[4].isComplete !== true);
+    				toggle_class(span0, "completed", /*item*/ ctx[5].isComplete !== true);
     			}
 
-    			if (dirty & /*items*/ 1 && div_id_value !== (div_id_value = /*item*/ ctx[4].id)) {
+    			if (dirty & /*items*/ 1 && div_id_value !== (div_id_value = /*item*/ ctx[5].id)) {
     				attr_dev(div, "id", div_id_value);
     			}
     		},
@@ -1807,7 +1811,7 @@ var app = (function () {
     		d: function destroy(detaching) {
     			if (detaching) detach_dev(div);
     			mounted = false;
-    			dispose();
+    			run_all(dispose);
     		}
     	};
 
@@ -1815,7 +1819,7 @@ var app = (function () {
     		block,
     		id: create_each_block.name,
     		type: "each",
-    		source: "(56:2) {#each items as item (item.id)}",
+    		source: "(73:2) {#each items as item (item.id)}",
     		ctx
     	});
 
@@ -1831,7 +1835,7 @@ var app = (function () {
     	let dispose;
     	let each_value = /*items*/ ctx[0];
     	validate_each_argument(each_value);
-    	const get_key = ctx => /*item*/ ctx[4].id;
+    	const get_key = ctx => /*item*/ ctx[5].id;
     	validate_each_keys(ctx, each_value, get_each_context, get_key);
 
     	for (let i = 0; i < each_value.length; i += 1) {
@@ -1849,7 +1853,7 @@ var app = (function () {
     			}
 
     			attr_dev(section, "class", "svelte-cpw4om");
-    			add_location(section, file, 51, 0, 1158);
+    			add_location(section, file, 68, 0, 1489);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -1872,7 +1876,7 @@ var app = (function () {
     			}
     		},
     		p: function update(ctx, [dirty]) {
-    			if (dirty & /*items, removeItem*/ 9) {
+    			if (dirty & /*items, removeItem, toggleComplete*/ 25) {
     				const each_value = /*items*/ ctx[0];
     				validate_each_argument(each_value);
     				for (let i = 0; i < each_blocks.length; i += 1) each_blocks[i].r();
@@ -1910,6 +1914,10 @@ var app = (function () {
 
     const flipDurationMs = 300;
 
+    function onHover() {
+    	console.log(this);
+    }
+
     function instance($$self, $$props, $$invalidate) {
     	let { items } = $$props;
 
@@ -1927,6 +1935,21 @@ var app = (function () {
 
     		_items.update(items => {
     			items = items.filter(item => item.id !== id);
+    			return items;
+    		});
+    	}
+
+    	function toggleComplete() {
+    		let id = this.parentElement.id;
+
+    		_items.update(items => {
+    			items.forEach(item => {
+    				if (item.id === id) {
+    					item.isComplete = !item.isComplete;
+    				}
+    			});
+
+    			console.log(items);
     			return items;
     		});
     	}
@@ -1952,7 +1975,9 @@ var app = (function () {
     		flipDurationMs,
     		handleDndConsider,
     		handleDndFinalize,
-    		removeItem
+    		removeItem,
+    		toggleComplete,
+    		onHover
     	});
 
     	$$self.$inject_state = $$props => {
@@ -1963,7 +1988,7 @@ var app = (function () {
     		$$self.$inject_state($$props.$$inject);
     	}
 
-    	return [items, handleDndConsider, handleDndFinalize, removeItem];
+    	return [items, handleDndConsider, handleDndFinalize, removeItem, toggleComplete];
     }
 
     class ItemList extends SvelteComponentDev {
@@ -2089,25 +2114,142 @@ var app = (function () {
     	}
     }
 
-    /* src/App.svelte generated by Svelte v3.24.0 */
-    const file$2 = "src/App.svelte";
+    /* src/components/Sandbox.svelte generated by Svelte v3.24.0 */
+
+    const { console: console_1$1 } = globals;
+    const file$2 = "src/components/Sandbox.svelte";
 
     function create_fragment$2(ctx) {
+    	let span;
+    	let button;
+    	let t0;
+    	let div;
+    	let mounted;
+    	let dispose;
+
+    	const block = {
+    		c: function create() {
+    			span = element("span");
+    			button = element("button");
+    			t0 = space();
+    			div = element("div");
+    			div.textContent = "now you see me";
+    			add_location(button, file$2, 23, 2, 239);
+    			attr_dev(div, "class", "svelte-1wc0ob2");
+    			toggle_class(div, "hidden", /*hidden*/ ctx[0] === true);
+    			add_location(div, file$2, 24, 2, 310);
+    			add_location(span, file$2, 21, 0, 229);
+    		},
+    		l: function claim(nodes) {
+    			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
+    		},
+    		m: function mount(target, anchor) {
+    			insert_dev(target, span, anchor);
+    			append_dev(span, button);
+    			append_dev(span, t0);
+    			append_dev(span, div);
+
+    			if (!mounted) {
+    				dispose = [
+    					listen_dev(button, "mouseenter", /*testFunction*/ ctx[1], false, false, false),
+    					listen_dev(button, "mouseleave", /*testFunction*/ ctx[1], false, false, false)
+    				];
+
+    				mounted = true;
+    			}
+    		},
+    		p: function update(ctx, [dirty]) {
+    			if (dirty & /*hidden*/ 1) {
+    				toggle_class(div, "hidden", /*hidden*/ ctx[0] === true);
+    			}
+    		},
+    		i: noop,
+    		o: noop,
+    		d: function destroy(detaching) {
+    			if (detaching) detach_dev(span);
+    			mounted = false;
+    			run_all(dispose);
+    		}
+    	};
+
+    	dispatch_dev("SvelteRegisterBlock", {
+    		block,
+    		id: create_fragment$2.name,
+    		type: "component",
+    		source: "",
+    		ctx
+    	});
+
+    	return block;
+    }
+
+    function instance$2($$self, $$props, $$invalidate) {
+    	function testFunction() {
+    		console.log(this);
+    		$$invalidate(0, hidden = !hidden);
+    		console.log(hidden);
+    	}
+
+    	const writable_props = [];
+
+    	Object.keys($$props).forEach(key => {
+    		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== "$$") console_1$1.warn(`<Sandbox> was created with unknown prop '${key}'`);
+    	});
+
+    	let { $$slots = {}, $$scope } = $$props;
+    	validate_slots("Sandbox", $$slots, []);
+    	$$self.$capture_state = () => ({ testFunction, hidden });
+
+    	$$self.$inject_state = $$props => {
+    		if ("hidden" in $$props) $$invalidate(0, hidden = $$props.hidden);
+    	};
+
+    	let hidden;
+
+    	if ($$props && "$$inject" in $$props) {
+    		$$self.$inject_state($$props.$$inject);
+    	}
+
+    	 $$invalidate(0, hidden = true);
+    	return [hidden, testFunction];
+    }
+
+    class Sandbox extends SvelteComponentDev {
+    	constructor(options) {
+    		super(options);
+    		init(this, options, instance$2, create_fragment$2, safe_not_equal, {});
+
+    		dispatch_dev("SvelteRegisterComponent", {
+    			component: this,
+    			tagName: "Sandbox",
+    			options,
+    			id: create_fragment$2.name
+    		});
+    	}
+    }
+
+    /* src/App.svelte generated by Svelte v3.24.0 */
+    const file$3 = "src/App.svelte";
+
+    function create_fragment$3(ctx) {
     	let section0;
     	let div0;
     	let title;
     	let t0;
+    	let sandbox;
+    	let t1;
     	let section1;
     	let div1;
     	let h40;
-    	let t2;
-    	let itemlist0;
     	let t3;
+    	let itemlist0;
+    	let t4;
     	let h41;
-    	let t5;
+    	let t6;
     	let itemlist1;
     	let current;
     	title = new Title({ $$inline: true });
+    	sandbox = new Sandbox({ $$inline: true });
 
     	itemlist0 = new ItemList({
     			props: { items: /*$_completedItems*/ ctx[0] },
@@ -2125,29 +2267,31 @@ var app = (function () {
     			div0 = element("div");
     			create_component(title.$$.fragment);
     			t0 = space();
+    			create_component(sandbox.$$.fragment);
+    			t1 = space();
     			section1 = element("section");
     			div1 = element("div");
     			h40 = element("h4");
     			h40.textContent = "ToDo";
-    			t2 = space();
-    			create_component(itemlist0.$$.fragment);
     			t3 = space();
+    			create_component(itemlist0.$$.fragment);
+    			t4 = space();
     			h41 = element("h4");
     			h41.textContent = "Complete";
-    			t5 = space();
+    			t6 = space();
     			create_component(itemlist1.$$.fragment);
     			attr_dev(div0, "class", "container");
-    			add_location(div0, file$2, 16, 2, 288);
+    			add_location(div0, file$3, 17, 2, 340);
     			attr_dev(section0, "class", "section");
-    			add_location(section0, file$2, 15, 0, 260);
+    			add_location(section0, file$3, 16, 0, 312);
     			attr_dev(h40, "class", "title is-4");
-    			add_location(h40, file$2, 23, 4, 403);
+    			add_location(h40, file$3, 27, 4, 472);
     			attr_dev(h41, "class", "title is-4");
-    			add_location(h41, file$2, 25, 4, 482);
+    			add_location(h41, file$3, 29, 4, 551);
     			attr_dev(div1, "class", "container");
-    			add_location(div1, file$2, 22, 2, 375);
+    			add_location(div1, file$3, 26, 2, 444);
     			attr_dev(section1, "class", "section");
-    			add_location(section1, file$2, 21, 0, 347);
+    			add_location(section1, file$3, 25, 0, 416);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -2156,15 +2300,17 @@ var app = (function () {
     			insert_dev(target, section0, anchor);
     			append_dev(section0, div0);
     			mount_component(title, div0, null);
-    			insert_dev(target, t0, anchor);
+    			append_dev(div0, t0);
+    			mount_component(sandbox, div0, null);
+    			insert_dev(target, t1, anchor);
     			insert_dev(target, section1, anchor);
     			append_dev(section1, div1);
     			append_dev(div1, h40);
-    			append_dev(div1, t2);
-    			mount_component(itemlist0, div1, null);
     			append_dev(div1, t3);
+    			mount_component(itemlist0, div1, null);
+    			append_dev(div1, t4);
     			append_dev(div1, h41);
-    			append_dev(div1, t5);
+    			append_dev(div1, t6);
     			mount_component(itemlist1, div1, null);
     			current = true;
     		},
@@ -2179,12 +2325,14 @@ var app = (function () {
     		i: function intro(local) {
     			if (current) return;
     			transition_in(title.$$.fragment, local);
+    			transition_in(sandbox.$$.fragment, local);
     			transition_in(itemlist0.$$.fragment, local);
     			transition_in(itemlist1.$$.fragment, local);
     			current = true;
     		},
     		o: function outro(local) {
     			transition_out(title.$$.fragment, local);
+    			transition_out(sandbox.$$.fragment, local);
     			transition_out(itemlist0.$$.fragment, local);
     			transition_out(itemlist1.$$.fragment, local);
     			current = false;
@@ -2192,7 +2340,8 @@ var app = (function () {
     		d: function destroy(detaching) {
     			if (detaching) detach_dev(section0);
     			destroy_component(title);
-    			if (detaching) detach_dev(t0);
+    			destroy_component(sandbox);
+    			if (detaching) detach_dev(t1);
     			if (detaching) detach_dev(section1);
     			destroy_component(itemlist0);
     			destroy_component(itemlist1);
@@ -2201,7 +2350,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$2.name,
+    		id: create_fragment$3.name,
     		type: "component",
     		source: "",
     		ctx
@@ -2210,7 +2359,7 @@ var app = (function () {
     	return block;
     }
 
-    function instance$2($$self, $$props, $$invalidate) {
+    function instance$3($$self, $$props, $$invalidate) {
     	let $_completedItems;
     	let $_incompletedItems;
     	validate_store(_completedItems, "_completedItems");
@@ -2232,6 +2381,7 @@ var app = (function () {
     		_incompletedItems,
     		ItemList,
     		Title,
+    		Sandbox,
     		$_completedItems,
     		$_incompletedItems
     	});
@@ -2242,13 +2392,13 @@ var app = (function () {
     class App extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance$2, create_fragment$2, safe_not_equal, {});
+    		init(this, options, instance$3, create_fragment$3, safe_not_equal, {});
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
     			tagName: "App",
     			options,
-    			id: create_fragment$2.name
+    			id: create_fragment$3.name
     		});
     	}
     }

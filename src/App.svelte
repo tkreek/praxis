@@ -7,6 +7,7 @@
   //Comonents
   import ItemList from "./components/ItemList.svelte";
   import Title from "./components/Title.svelte";
+  import Sandbox from "./components/Sandbox.svelte"
 </script>
 
 <style>
@@ -16,6 +17,9 @@
 <section class="section">
   <div class="container">
     <Title />
+
+    <Sandbox/>
+
   </div>
 </section>
 
