@@ -2,6 +2,8 @@
   //Library
 
   //Data
+    import { _deleteItem } from "./store.js";
+
 
   //Comonents
 
@@ -22,7 +24,7 @@
 
   //Logic
   function deleteItem() {
-    console.log("itemDeleted");
+    _deleteItem(this.parentElement.id)
   }
 </script>
 
