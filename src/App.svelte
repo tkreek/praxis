@@ -2,33 +2,36 @@
   //Library
 
   //Data
-  import { _items, _completedItems, _incompletedItems } from "./data/store.js";
 
   //Comonents
-  import ItemList from "./components/ItemList.svelte";
-  import Title from "./components/Title.svelte";
-  import Sandbox from "./components/Sandbox.svelte"
+
+  //variables
+  export let placeholder = "Describe the step..."
+  export let isHidden = true
+
+
 </script>
 
 <style>
+
+input[type="text"] {
+  border:none;
+  width: auto;
+
+}
 
 </style>
 
 <section class="section">
   <div class="container">
-    <Title />
-
-    <Sandbox/>
-
-  </div>
-</section>
-
-<section class="section">
-  <div class="container">
-    <h4 class="title is-4">ToDo</h4>
-    <ItemList items={$_completedItems} />
-    <h4 class="title is-4">Complete</h4>
-    <ItemList items={$_incompletedItems} />
+    <div class='task'>
+      <input type="checkbox" >
+      <input type="text" placeholder={placeholder}>
+      <button>🗑</button>
+      
+    
+    
+    </div>
 
   </div>
 </section>
