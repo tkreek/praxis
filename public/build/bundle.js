@@ -30,6 +30,21 @@ var app = (function () {
     function safe_not_equal(a, b) {
         return a != a ? b == b : a !== b || ((a && typeof a === 'object') || typeof a === 'function');
     }
+    function validate_store(store, name) {
+        if (store != null && typeof store.subscribe !== 'function') {
+            throw new Error(`'${name}' is not a store with a 'subscribe' method`);
+        }
+    }
+    function subscribe(store, ...callbacks) {
+        if (store == null) {
+            return noop;
+        }
+        const unsub = store.subscribe(...callbacks);
+        return unsub.unsubscribe ? () => unsub.unsubscribe() : unsub;
+    }
+    function component_subscribe(component, store, callback) {
+        component.$$.on_destroy.push(subscribe(store, callback));
+    }
 
     function append(target, node) {
         target.appendChild(node);
@@ -413,6 +428,130 @@ var app = (function () {
         $inject_state() { }
     }
 
+    const subscriber_queue = [];
+    /**
+     * Creates a `Readable` store that allows reading by subscription.
+     * @param value initial value
+     * @param {StartStopNotifier}start start and stop notifications for subscriptions
+     */
+    function readable(value, start) {
+        return {
+            subscribe: writable(value, start).subscribe,
+        };
+    }
+    /**
+     * Create a `Writable` store that allows both updating and reading by subscription.
+     * @param {*=}value initial value
+     * @param {StartStopNotifier=}start start and stop notifications for subscriptions
+     */
+    function writable(value, start = noop) {
+        let stop;
+        const subscribers = [];
+        function set(new_value) {
+            if (safe_not_equal(value, new_value)) {
+                value = new_value;
+                if (stop) { // store is ready
+                    const run_queue = !subscriber_queue.length;
+                    for (let i = 0; i < subscribers.length; i += 1) {
+                        const s = subscribers[i];
+                        s[1]();
+                        subscriber_queue.push(s, value);
+                    }
+                    if (run_queue) {
+                        for (let i = 0; i < subscriber_queue.length; i += 2) {
+                            subscriber_queue[i][0](subscriber_queue[i + 1]);
+                        }
+                        subscriber_queue.length = 0;
+                    }
+                }
+            }
+        }
+        function update(fn) {
+            set(fn(value));
+        }
+        function subscribe(run, invalidate = noop) {
+            const subscriber = [run, invalidate];
+            subscribers.push(subscriber);
+            if (subscribers.length === 1) {
+                stop = start(set) || noop;
+            }
+            run(value);
+            return () => {
+                const index = subscribers.indexOf(subscriber);
+                if (index !== -1) {
+                    subscribers.splice(index, 1);
+                }
+                if (subscribers.length === 0) {
+                    stop();
+                    stop = null;
+                }
+            };
+        }
+        return { set, update, subscribe };
+    }
+    function derived(stores, fn, initial_value) {
+        const single = !Array.isArray(stores);
+        const stores_array = single
+            ? [stores]
+            : stores;
+        const auto = fn.length < 2;
+        return readable(initial_value, (set) => {
+            let inited = false;
+            const values = [];
+            let pending = 0;
+            let cleanup = noop;
+            const sync = () => {
+                if (pending) {
+                    return;
+                }
+                cleanup();
+                const result = fn(single ? values[0] : values, set);
+                if (auto) {
+                    set(result);
+                }
+                else {
+                    cleanup = is_function(result) ? result : noop;
+                }
+            };
+            const unsubscribers = stores_array.map((store, i) => subscribe(store, (value) => {
+                values[i] = value;
+                pending &= ~(1 << i);
+                if (inited) {
+                    sync();
+                }
+            }, () => {
+                pending |= (1 << i);
+            }));
+            inited = true;
+            sync();
+            return function stop() {
+                run_all(unsubscribers);
+                cleanup();
+            };
+        });
+    }
+
+    const _items = writable([
+        { id: '0001', isComplete: true, text: 'Create a list' },
+        { id: '0002', isComplete: true, text: 'Create a very big list' },
+        { id: '0003', isComplete: false, text: 'Make some dummy data' },
+        { id: '0004', isComplete: false, text: 'Write css for completed item' },
+
+    ]);
+
+
+    const _completedItems = derived(
+        _items,
+        $_items => $_items.filter(item => item.isComplete)
+
+    );
+
+    const _incompletedItems = derived(
+        _items,
+        $_items => $_items.filter(item => !item.isComplete)
+
+    );
+
     /* src/Item.svelte generated by Svelte v3.24.0 */
 
     const { console: console_1 } = globals;
@@ -637,7 +776,7 @@ var app = (function () {
     	return child_ctx;
     }
 
-    // (30:4) {#each items as item, i}
+    // (11:4) {#each $_items as item, i}
     function create_each_block(ctx) {
     	let item;
     	let current;
@@ -659,7 +798,7 @@ var app = (function () {
     			current = true;
     		},
     		p: function update(ctx, dirty) {
-    			const item_changes = (dirty & /*items*/ 1)
+    			const item_changes = (dirty & /*$_items*/ 1)
     			? get_spread_update(item_spread_levels, [get_spread_object(/*item*/ ctx[1])])
     			: {};
 
@@ -683,7 +822,7 @@ var app = (function () {
     		block,
     		id: create_each_block.name,
     		type: "each",
-    		source: "(30:4) {#each items as item, i}",
+    		source: "(11:4) {#each $_items as item, i}",
     		ctx
     	});
 
@@ -694,7 +833,7 @@ var app = (function () {
     	let section;
     	let div;
     	let current;
-    	let each_value = /*items*/ ctx[0];
+    	let each_value = /*$_items*/ ctx[0];
     	validate_each_argument(each_value);
     	let each_blocks = [];
 
@@ -716,9 +855,9 @@ var app = (function () {
     			}
 
     			attr_dev(div, "class", "container");
-    			add_location(div, file$1, 28, 2, 501);
+    			add_location(div, file$1, 9, 2, 131);
     			attr_dev(section, "class", "section");
-    			add_location(section, file$1, 27, 0, 473);
+    			add_location(section, file$1, 8, 0, 103);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -734,8 +873,8 @@ var app = (function () {
     			current = true;
     		},
     		p: function update(ctx, [dirty]) {
-    			if (dirty & /*items*/ 1) {
-    				each_value = /*items*/ ctx[0];
+    			if (dirty & /*$_items*/ 1) {
+    				each_value = /*$_items*/ ctx[0];
     				validate_each_argument(each_value);
     				let i;
 
@@ -798,29 +937,9 @@ var app = (function () {
     }
 
     function instance$1($$self, $$props, $$invalidate) {
-    	let items = [
-    		{
-    			id: "0001",
-    			text: "Add delete item functionality",
-    			isComplete: false
-    		},
-    		{
-    			id: "0002",
-    			text: "Order item by complete ones first",
-    			isComplete: false
-    		},
-    		{
-    			id: "0003",
-    			text: "add movable functionality",
-    			isComplete: false
-    		},
-    		{
-    			id: "0003",
-    			text: "add movable functionality",
-    			isComplete: false
-    		}
-    	];
-
+    	let $_items;
+    	validate_store(_items, "_items");
+    	component_subscribe($$self, _items, $$value => $$invalidate(0, $_items = $$value));
     	const writable_props = [];
 
     	Object.keys($$props).forEach(key => {
@@ -829,17 +948,8 @@ var app = (function () {
 
     	let { $$slots = {}, $$scope } = $$props;
     	validate_slots("App", $$slots, []);
-    	$$self.$capture_state = () => ({ Item, items });
-
-    	$$self.$inject_state = $$props => {
-    		if ("items" in $$props) $$invalidate(0, items = $$props.items);
-    	};
-
-    	if ($$props && "$$inject" in $$props) {
-    		$$self.$inject_state($$props.$$inject);
-    	}
-
-    	return [items];
+    	$$self.$capture_state = () => ({ _items, Item, $_items });
+    	return [$_items];
     }
 
     class App extends SvelteComponentDev {
