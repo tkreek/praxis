@@ -1,37 +1,34 @@
 <script>
-  //Library
+  import Item from "./Item.svelte";
 
-  //Data
-
-  //Comonents
-
-  //variables
-  export let placeholder = "Describe the step..."
-  export let isHidden = true
-
-
+  let items = [
+    {
+      id: "0001",
+      text: "Add delete item functionality",
+      isComplete: false
+    },
+    {
+      id: "0002",
+      text: "Order item by complete ones first",
+      isComplete: false
+    },
+    {
+      id: "0003",
+      text: "add movable functionality",
+      isComplete: false
+    },
+    {
+      id: "0003",
+      text: "add movable functionality",
+      isComplete: false
+    }
+  ];
 </script>
-
-<style>
-
-input[type="text"] {
-  border:none;
-  width: auto;
-
-}
-
-</style>
 
 <section class="section">
   <div class="container">
-    <div class='task'>
-      <input type="checkbox" >
-      <input type="text" placeholder={placeholder}>
-      <button>🗑</button>
-      
-    
-    
-    </div>
-
+    {#each items as item, i}
+      <Item {...item} />
+    {/each}
   </div>
 </section>
