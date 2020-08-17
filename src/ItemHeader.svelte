@@ -1,8 +1,10 @@
 <script>
-  import { _addItem } from "./store.js";
+  import {_state, _addItem } from "./store.js";
+
+  export let name
 
   function addItem() {
-    _addItem()
+    _addItem($_state.blockID)
   }
 </script>
 
@@ -17,6 +19,6 @@
 </style>
 
 <h1 class="title is-4">
-  Items
+  {name}
   <button on:click={addItem}>New Item +</button>
 </h1>

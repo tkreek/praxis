@@ -54,6 +54,6 @@
   on:mouseenter={toggleHidden}
   on:mouseleave={toggleHidden}>
   <input type="checkbox" class:hidden bind:checked={isComplete} />
-  <input type="text" {placeholder} value={text} class:complete={isComplete} />
+  <input type="text" {placeholder} bind:value={text} class:complete={isComplete} />
   <button class:hidden on:click={deleteItem}>🗑</button>
 </div>
