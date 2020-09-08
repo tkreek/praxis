@@ -2,7 +2,7 @@
   //Library
 
   //Data
-    import { _deleteItem } from "./store.js";
+    import { step } from "./store.js";
 
 
   //Comonents
@@ -26,6 +26,13 @@
   function deleteItem() {
     _deleteItem(this.parentElement.id)
   }
+
+
+  function displayPoms () {
+    let poms = '🍅🍅🍅🍅'
+    return poms
+  }
+
 </script>
 
 <style>
@@ -39,6 +46,11 @@
     border: none;
   }
 
+  .block {
+    display: flex;
+    align-items: center;
+  }
+
   .hidden {
     visibility: hidden;
   }
@@ -49,11 +61,12 @@
 </style>
 
 <div
-  class="task"
+  class="block"
   {id}
   on:mouseenter={toggleHidden}
   on:mouseleave={toggleHidden}>
   <input type="checkbox" class:hidden bind:checked={isComplete} />
   <input type="text" {placeholder} value={text} class:complete={isComplete} />
+  <p>{displayPoms()}</p>
   <button class:hidden on:click={deleteItem}>🗑</button>
 </div>
